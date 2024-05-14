@@ -1,3 +1,3 @@
-<x-layout>
-    <x-note-full :$note></x-note-full>
-</x-layout>
+<x-app-layout>
+    <x-notes.list :$note type="full"></x-notes.list>
+</x-app-layout>

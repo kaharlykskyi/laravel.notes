@@ -13,7 +13,10 @@ class NoteController extends Controller
      */
     public function index()
     {
-        $notes = Note::query()->orderBy('created_at', 'desc')->simplePaginate(5);
+        $notes = Note::query()
+            ->where("user_id", auth()->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
         return view('note.index', compact('notes'));
     }
 
@@ -31,7 +34,7 @@ class NoteController extends Controller
     public function store(StoreNoteRequest $request)
     {
         $validated = $request->validated();
-        $validated['user_id'] = 1;
+        $validated['user_id'] = auth()->user()->id;
 
         Note::create($validated);
 
@@ -43,6 +46,9 @@ class NoteController extends Controller
      */
     public function show(Note $note)
     {
+        if ($note->user_id != auth()->user()->id) {
+            abort(403);
+        }
         return view('note.show', compact('note'));
     }
 
@@ -51,6 +57,9 @@ class NoteController extends Controller
      */
     public function edit(Note $note)
     {
+        if ($note->user_id != auth()->user()->id) {
+            abort(403);
+        }
         return view('note.edit', compact('note'));
     }
 
@@ -59,6 +68,10 @@ class NoteController extends Controller
      */
     public function update(StoreNoteRequest $request, Note $note)
     {
+        if ($note->user_id != auth()->user()->id) {
+            abort(403);
+        }
+
         $validated = $request->validated();
 
         $note->update($validated);
@@ -71,6 +84,10 @@ class NoteController extends Controller
      */
     public function destroy(Note $note)
     {
+        if ($note->user_id != auth()->user()->id) {
+            abort(403);
+        }
+
         $note->delete();
 
         return to_route('note.index')->with('message', 'Note was deleted successfully');
